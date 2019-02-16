@@ -1,0 +1,119 @@
+<%
+# 本章のTOC作成
+require 'oga'
+
+body_xml = Oga.parse_html(@body)
+@sections = body_xml.xpath("//h2").map do |section|
+  title = section.text
+  link = section.xpath(".//a")[0].attributes[0]
+  { title: title, link_id: link.value }
+end
+%>
+
+<!DOCTYPE html>
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="<%=h @language %>">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="densan.css" />
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
+
+    <% if @next.present? %><link rel="next" title="<%= h(@next_title)%>" href="<%= h(@next.id.to_s+"."+@book.config['htmlext']) %>"><% end %>
+    <% if @prev.present? %><link rel="prev" title="<%= h(@prev_title)%>" href="<%= h(@prev.id.to_s+"."+@book.config['htmlext']) %>"><% end %>
+
+    <meta name="generator" content="Re:VIEW" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title><%=h @title %> | <%=h @book.config["booktitle"]%></title>
+  </head>
+
+  <body<%= @body_ext %>>
+
+    <header>
+      <div class="navbar navbar-default navbar-top">
+        <div class="container">
+          <div class="navbar-header">
+            <a href="/" class="navbar-brand">実践データベース設計</a>
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+          <div class="navbar-collapse collapse" id="navbar-main">
+            <ul class="nav navbar-nav">
+              <li><a href="/">Top</a></li>
+              <li><a href="http://github.com/nishio-dens/">Github</a></li>
+              <li><a href="#">PDF version</a></li>
+              <li><a href="#">EPUB version</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="book container">
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="btn-group btn-group-justified mb-10">
+            <% if @prev.present? %>
+              <a href="<%= h(@prev.id.to_s+"."+@book.config['htmlext']) %>" class="btn btn-default">
+                前章: <%= @prev.title %> に戻る
+              </a>
+            <% end %>
+            <% if @next.present? %>
+              <a href="<%= h(@next.id.to_s+"."+@book.config['htmlext']) %>" class="btn btn-default">
+                次章: <%= @next.title %> に進む
+              </a>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="col-xs-9 book-body">
+          <header>
+          </header>
+          <div class="book-page">
+            <%= @body %>
+          </div>
+        </div>
+
+        <div class="col-xs-3 side-content hidden-xs">
+          <h4>本章のコンテンツ</h4>
+          <ul>
+            <% @sections.each do |section| %>
+              <li><a href="#<%= section[:link_id] %>"><%= section[:title] %></a></li>
+            <% end %>
+          </ul>
+
+          <hr>
+
+          <h4>目次</h4>
+          <%= @toc %>
+        </div>
+
+      </div>
+    </div><!-- /container -->
+
+    <footer class="docs-footer">
+      <div class="container">
+        <p>© Copyright 2019 <a href="http://densan-labs.net">DensanLabs</a>
+          Powered by <a href="https://github.com/kmuto/review">Re:VIEW</a>.</p>
+        <p>TODO <%= Time.now %>.<%= (`git rev-parse HEAD`)[0..10] %>
+      </div>
+    </footer>
+
+    <script src="jquery.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-85435763-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </body>
+
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="<%=h @language %>">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="densan.css" />
+    <meta name="generator" content="Re:VIEW" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title><%=h @title %></title>
+  </head>
+
+  <body>
+    <header>
+      <div class="navbar navbar-default navbar-top">
+        <div class="container">
+          <div class="navbar-header">
+            <a href="/" class="navbar-brand">TODO</a>
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+          <div class="navbar-collapse collapse" id="navbar-main">
+            <ul class="nav navbar-nav">
+              <li><a href="/">Top</a></li>
+              <li><a href="http://github.com/nishio-dens/angular2-application-build-guide">Github</a></li>
+              <li><a href="http://dist.angular2.densan-labs.net/">PDF version</a></li>
+              <li><a href="http://dist.angular2.densan-labs.net/">EPUB version</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="book container">
+      <div class="row">
+        <div class="col-xs-12 book-body">
+          <div class="mb-10">
+            <p>
+              TODO
+            </p>
+            <p>
+              <%= Time.now %> 現在は何もできていません。
+            </p>
+          </div>
+          <div class="book-page">
+            <h3>目次</h3>
+            <ul>
+              <% @toc.each.with_index(1) do |content, index| %>
+                <li class="mb-10">
+                  <a href="<%= content[:chapter].id %>.html">
+                    第<%= index %>章: <%= content[:chapter].title %>
+                  </a>
+
+                  <% unless content[:sections].nil? %>
+                    <ul>
+                      <% content[:sections].each.with_index(1) do |section, sec_index| %>
+                      <li>
+                        <a href="<%=content[:chapter].id%>.html#h<%= index %>-<%= sec_index %>">
+                          <%= "#{index}.#{sec_index}" %>: <%= section.label %>
+                        </a>
+                      </li>
+                      <% end %>
+                    </ul>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div><!-- /container -->
+
+    <footer class="docs-footer">
+      <div class="container">
+        <p>© Copyright 2019 <a href="http://densan-labs.net">DensanLabs</a>
+          Powered by <a href="https://github.com/kmuto/review">Re:VIEW</a>.</p>
+        <p>TODO Ver. <%= Time.now %>.<%= (`git rev-parse HEAD`)[0..10] %>
+      </div>
+    </footer>
+
+    <script src="jquery.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-85435763-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </body>
+
+</html>

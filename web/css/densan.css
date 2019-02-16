@@ -1,0 +1,84 @@
+@charset "utf-8";
+
+.mt-15 {
+  margin-top: 15px;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.lead {
+  color: #3d8b40;
+  font-size: 105%;
+}
+
+h1 {
+  padding-bottom: .5em;
+  border-bottom: 1px solid #ccc;
+}
+
+h2 {
+  font-size: 130%;
+  padding: .25em 0 .5em .75em;
+  border-left: 6px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+h3 {
+  font-size: 110%;
+  padding: .25em 0 .5em .75em;
+  border-left: 5px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+h4 {
+  font-size: 105%;
+}
+
+div p.caption {
+    margin: 0;
+    color: #666;
+    font-size: 0.75em;
+    font-weight: bold;
+}
+
+div .info {
+  color: #0c7cd5;
+  background-color: #e3f2fd;
+  border-color: #c1ebfc;
+
+  padding: 15px;
+  margin-bottom: 24px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+div .tip {
+  color: #3d8b40;
+  background-color: #d9eeda;
+  border-color: #cbe7c7;
+
+  padding: 15px;
+  margin-bottom: 24px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+div .notice {
+  color: #3d8b40;
+  background-color: #d9eeda;
+  border-color: #cbe7c7;
+
+  padding: 15px;
+  margin-bottom: 24px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+.docs-footer {
+  padding-top: 50px;
+  padding-bottom: 50px;
+  color: #99979c;
+  background-color: #2a2730;
+}

@@ -1,0 +1,7 @@
+version: '3'
+services:
+  review:
+    volumes:
+      - .:/works
+    build: .
+    working_dir: /works/src
