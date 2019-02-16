@@ -5,3 +5,5 @@ webroot/
 dist/
 book-pdf
 book-epub
+
+node_modules
