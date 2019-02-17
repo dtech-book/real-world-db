@@ -9,12 +9,13 @@ Amazonや楽天、ヤフーショッピングやメルカリなど、一度はEC
 
 == 議論するECシステム
 
-今回は次の2つのECシステムを取り上げます。
+次の2つのECシステムを取り上げます。
 どちらのシステムもOSS(オープンソース)として公開されており、誰でも自由に構築・利用・改変できます。
 
-==== Spree
+=== Spree
 
-SpreeはRuby on Railsで作られたオープンソースのECシステムであり、実世界で45000店舗以上に採用されているという実績をもっています。
+SpreeはRuby on Railsで作られたオープンソースのECシステムです。
+実世界で45000店舗以上に採用されているという実績をもっています。
 ECサイトに必要な基本的な機能は備えており、カスタマイズ性も優れているので、自サイトにあったシステムへ改修しやすいといった特徴があります。
 
 一度はOSSとしての開発が終了するのではという噂がありましたが、2019年現在でも活発に開発が行われています。
@@ -22,7 +23,7 @@ ECサイトに必要な基本的な機能は備えており、カスタマイズ
 今回はSpreeのバージョン3.7を取り上げます。
 ソースコードは @<href>{https://github.com/spree/spree}にて公開されています。
 
-==== EC-CUBE
+=== EC-CUBE
 
 EC-CUBEはPHPで作られた、日本で人気の高いオープンソースのECシステムです。
 日本国内のシェアは、他のオープンソースのECを抑えてナンバーワンとなっています。
@@ -48,10 +49,8 @@ DB設計をするには、開発するサービスに関する深い業務知識
 === 商品紹介ページ
 
 多くのネットショップの場合、
-@<img>{ec-intro-spree-storefront-product-list}や@<img>{ec-intro-eccube-storefront-product-list} のように、商品がカテゴライズされて並んでいます。
+@<img>{ec-intro-eccube-storefront-product-list} のように、商品がカテゴライズされて並んでいます。
 
-
-//image[ec-intro-spree-storefront-product-list][Spreeショップの商品一覧][scale=1.0]
 //image[ec-intro-eccube-storefront-product-list][EC-CUBEショップの商品一覧][scale=1.0]
 
 
@@ -102,9 +101,7 @@ DB設計をするには、開発するサービスに関する深い業務知識
 === 商品の注文
 
 カートに入れた商品は注文できます。
-注文は会員登録が必要な場合もあれば、ゲスト購入のように会員登録せずに購入手続きを進めることもできます(@<img>{ec-intro-eccube-order-login})。
-
-//image[ec-intro-eccube-order-login][EC-CUBEショップのゲスト購入]
+注文は会員登録が必要な場合もあれば、ゲスト購入のように会員登録せずに購入手続きを進めることもできます。
 
 購入手続きに進むと、配送先のお客様情報を入力します。
 配送先には名前、住所、電話番号、メールアドレスといった情報を登録します(@<img>{ec-intro-eccube-shipping-info})。
@@ -144,6 +141,8 @@ DB設計をするには、開発するサービスに関する深い業務知識
 
 == 運用者から見たEC
 
+#@# ここでは大まかにシステムのイメージが掴める程度の説明をする。具体的な機能は各章で行う
+
 サイトの運用者目線でシステムを眺めてみます。
 ECに限らず、運用者側のシステムの多くは、利用者側のシステムより複雑です。
 想定外のフローにどこまで対応する必要があるか、できるべきかをよく考えることが、良い設計をするための鍵となります。
@@ -152,16 +151,45 @@ ECに限らず、運用者側のシステムの多くは、利用者側のシス
 
 === 商品管理
 
+//image[ec-intro-eccube-admin-product][EC-CUBE運営 商品登録画面]
 
-== ECに必要なデータ
+TODO
+
+//image[ec-intro-eccube-admin-product-class][EC-CUBE運営 規格登録]
+
+TODO
+
+//image[ec-intro-spree-admin-product][Spree運営 商品登録画面]
+
+TODO
+
+//image[ec-intro-spree-admin-product-variant][Spree運営 商品バリアント]
+
+TODO
+
+//image[ec-intro-spree-admin-product-property][Spree運営 商品プロパティ]
+
+TODO
+
+//image[ec-intro-spree-admin-product-stock][Spree運営 在庫管理]
 
 
-利用者視点で、ECに必要な機能は@<table>{ec-intro-storefront-functions}のとおりです。
+#@# バリアントの説明はSAPの文書がわかりやすい
+#@# https://help.sap.com/doc/saphelp_afs63/6.3/ja-JP/12/08480e470311d1894a0000e8323352/frameset.htm
 
-//table[ec-intro-storefront-functions][商品紹介ページに必要な機能]{
-機能名			説明
-テスト機能			ABCDABCDテストでステテストです
-//}
+=== 受注管理
+
+TODO
+
+=== 返金・返品管理
+
+TODO
+
+=== レポート
+
+TODO
 
 
 == この章のまとめ
+
+TODO

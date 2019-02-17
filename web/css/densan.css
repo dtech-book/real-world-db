@@ -8,14 +8,26 @@
   margin-bottom: 10px;
 }
 
+.mb-30 {
+  margin-bottom: 30px;
+}
+
 .lead {
   color: #3d8b40;
   font-size: 105%;
 }
 
+.book {
+  margin-bottom: 40px;
+}
+
 h1 {
   padding-bottom: .5em;
   border-bottom: 1px solid #ccc;
+}
+
+.book h1 {
+  margin-bottom: 24px;
 }
 
 h2 {
@@ -25,11 +37,19 @@ h2 {
   border-bottom: 1px solid #ccc;
 }
 
+.book h2 {
+  margin-bottom: 24px;
+}
+
 h3 {
   font-size: 110%;
-  padding: .25em 0 .5em .75em;
-  border-left: 5px solid #ccc;
-  border-bottom: 1px solid #ccc;
+  font-weight: bold;
+  padding: .25em 0 .5em 0;
+}
+
+.book h3 {
+  margin-top: 12px;
+  margin-bottom: 12px;
 }
 
 h4 {
@@ -37,10 +57,10 @@ h4 {
 }
 
 div p.caption {
-    margin: 0;
-    color: #666;
-    font-size: 0.75em;
-    font-weight: bold;
+  margin: 0;
+  color: #666;
+  font-size: 0.9em;
+  font-weight: bold;
 }
 
 div .info {
@@ -81,4 +101,15 @@ div .notice {
   padding-bottom: 50px;
   color: #99979c;
   background-color: #2a2730;
+}
+
+.image {
+  position: relative;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.image img {
+  max-width: 80%;
+  margin: 20px auto;
 }
