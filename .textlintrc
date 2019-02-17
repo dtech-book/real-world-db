@@ -6,7 +6,7 @@
   "rules": {
     "preset-ja-technical-writing": true,
     "max-ten": {
-      "max": 3
+      "max": 5
     }
   }
 }

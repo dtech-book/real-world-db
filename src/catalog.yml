@@ -1,11 +1,11 @@
 PREDEF:
 
 CHAPS:
-  - "ECのDB設計":
-    - intro.re
-    - test.re
+  - "DB設計総論":
+    - basic-intro.re
+  - "ECシステムのDB設計":
+    - ec-intro.re
 
 APPENDIX:
 
 POSTDEF:
-

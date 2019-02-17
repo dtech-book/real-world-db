@@ -67,6 +67,8 @@ file WEBROOT => SRC do
   generate_my_web_index
   sh "cp ./web/js/*.js ./webroot/"
   sh "cp ./web/css/*.css ./webroot/"
+  sh "mkdir ./webroot/src"
+  sh "cp -rf ./src/images ./webroot/src/"
 end
 
 # Indexページに付けるタイトルを指定する
