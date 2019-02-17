@@ -5,6 +5,7 @@ CHAPS:
     - basic-intro.re
   - "ECシステムのDB設計":
     - ec-intro.re
+    - ec-product-master.re
 
 APPENDIX:
 
