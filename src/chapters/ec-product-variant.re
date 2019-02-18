@@ -17,13 +17,13 @@ Spreeでは、商品と商品規格は@<img>{ec-product-variant-spree-p1}のよ�
 商品はproducts、商品規格はvariantsテーブルに持ちます。
 
 #@# ここは具体的なERに差し替える
-//image[ec-product-variant-spree-p1][Spreeの商品とバリエーションの関係]
+//image[ec-product-variant-spree-p1][Spreeの商品とバリエーションの関係][scale=0.5]
 
 EC-CUBEでも、Spreeとテーブル名が異なるだけで@<img>{ec-product-variant-eccube-p1}のような関係のテーブルで
 商品と商品規格を持ちます。
 
 #@# ここは具体的なERに差し替える
-//image[ec-product-variant-eccube-p1][EC-CUBEの商品とバリエーションの関係]
+//image[ec-product-variant-eccube-p1][EC-CUBEの商品とバリエーションの関係][scale=0.5]
 
 
 === 単品商品のデータのもたせ方
