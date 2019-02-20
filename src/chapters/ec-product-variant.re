@@ -14,7 +14,7 @@ ECのオープンソースプロダクトであるSpree及びEC-CUBEの商品マ
 Spreeでは、これら特性の違う商品を@<strong>{バリアント}と呼び、EC-CUBEでは@<strong>{規格}と呼んでいます。
 今後、商品バリエーションのことを、本書では@<strong>{商品規格}と呼ぶことにします(@<img>{ec-product-variant-pd1})。
 
-//image[ec-product-variant-pd1][商品と商品規格][scale=0.2]
+//image[ec-product-variant-pd1][商品と商品規格][scale=0.5]
 
 
 Spreeでは、商品と商品規格は@<img>{ec-product-variant-spree-p1}のような関係を持ちます。
