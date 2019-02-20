@@ -1,0 +1,180 @@
+﻿# A5:ER FORMAT:12
+# A5:ER ENCODING:UTF8
+# A5:ER Mk-1 Copyright (C)2007 m.matsubara
+# A5:SQL Mk-2 Copyright (C)1997 m.matsubara
+#  http://www.wind.sannet.ne.jp/m_matsu/developer/a5m2/
+
+[Manager]
+ProjectName=
+Author=
+MaxEntityRowShow=1000
+ReadOnlyRecommend=0
+Page=Main
+PageInfo="Main",4,"A3Landscape",$FFFFFF
+LogicalView=0
+DecodeDomain=0
+ViewModePageIndividually=1
+ViewMode=4
+ViewFormat=0
+UseNondependenceDashLine=0
+FontName=Tahoma
+FontSize=6
+PaperSize=A4Landscape
+HeaderLeft=
+HeaderCenter=
+HeaderRight=
+FooterLeft=
+FooterCenter=
+FooterRight=
+ShowPageoutRelation=1
+DefaultPkName=%0:s_PKC
+DefaultPkIndexName=%0:s_PKI
+DefaultIndexName=%0:s_IX%1:d
+DefaultFkName=%0:s_FK%1:d
+SqlSeparator=0
+ShowTag=1
+ShowCommonAttributes=0
+
+[Entity]
+PName=dtb_authority_role
+LName=dtb_authority_role
+Comment=
+TableOption=
+Page=Main
+Left=50
+Top=50
+Field="id","id","int(10) unsigned auto_increment","NOT NULL",0,"","",$FFFFFFFF,""
+Field="authority_id","authority_id","smallint(5) unsigned",,,"","",$FFFFFFFF,""
+Field="creator_id","creator_id","int(10) unsigned",,,"","",$FFFFFFFF,""
+Field="deny_url","deny_url","varchar(4000)","NOT NULL",,"","",$FFFFFFFF,""
+Field="(DC2Type","create_date","datetime","NOT NULL",,"","datetimetz)",$FFFFFFFF,""
+Field="(DC2Type","update_date","datetime","NOT NULL",,"","datetimetz)",$FFFFFFFF,""
+Field="discriminator_type","discriminator_type","varchar(255)","NOT NULL",,"","",$FFFFFFFF,""
+Index=IDX_4A1F70B181EC865B=0,authority_id
+Index=IDX_4A1F70B161220EA6=0,creator_id
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+Position="Main",50,50
+
+[Entity]
+PName=dtb_product
+LName=dtb_product
+Comment=
+TableOption=
+Page=Main
+Left=600
+Top=750
+Field="id","id","int(10) unsigned auto_increment","NOT NULL",0,"","",$FFFFFFFF,""
+Field="creator_id","creator_id","int(10) unsigned",,,"","",$FFFFFFFF,""
+Field="product_status_id","product_status_id","smallint(5) unsigned",,,"","",$FFFFFFFF,""
+Field="name","name","varchar(255)","NOT NULL",,"","",$FFFFFFFF,""
+Field="note","note","varchar(4000)",,,"","",$FFFFFFFF,""
+Field="description_list","description_list","varchar(4000)",,,"","",$FFFFFFFF,""
+Field="description_detail","description_detail","varchar(4000)",,,"","",$FFFFFFFF,""
+Field="search_word","search_word","varchar(4000)",,,"","",$FFFFFFFF,""
+Field="free_area","free_area","longtext",,,"","",$FFFFFFFF,""
+Field="(DC2Type","create_date","datetime","NOT NULL",,"","datetimetz)",$FFFFFFFF,""
+Field="(DC2Type","update_date","datetime","NOT NULL",,"","datetimetz)",$FFFFFFFF,""
+Field="discriminator_type","discriminator_type","varchar(255)","NOT NULL",,"","",$FFFFFFFF,""
+Index=IDX_C49DE22F61220EA6=0,creator_id
+Index=IDX_C49DE22F557B630=0,product_status_id
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+Position="Main",600,750
+
+[Entity]
+PName=dtb_product_class
+LName=dtb_product_class
+Comment=
+TableOption=
+Page=Main
+Left=1250
+Top=750
+Field="id","id","int(10) unsigned auto_increment","NOT NULL",0,"","",$FFFFFFFF,""
+Field="product_id","product_id","int(10) unsigned",,,"","",$FFFFFFFF,""
+Field="sale_type_id","sale_type_id","smallint(5) unsigned",,,"","",$FFFFFFFF,""
+Field="class_category_id1","class_category_id1","int(10) unsigned",,,"","",$FFFFFFFF,""
+Field="class_category_id2","class_category_id2","int(10) unsigned",,,"","",$FFFFFFFF,""
+Field="delivery_duration_id","delivery_duration_id","int(10) unsigned",,,"","",$FFFFFFFF,""
+Field="creator_id","creator_id","int(10) unsigned",,,"","",$FFFFFFFF,""
+Field="product_code","product_code","varchar(255)",,,"","",$FFFFFFFF,""
+Field="stock","stock","decimal(10,0)",,,"","",$FFFFFFFF,""
+Field="stock_unlimited","stock_unlimited","tinyint(1)","NOT NULL",,"0","",$FFFFFFFF,""
+Field="sale_limit","sale_limit","decimal(10,0) unsigned",,,"","",$FFFFFFFF,""
+Field="price01","price01","decimal(12,2)",,,"","",$FFFFFFFF,""
+Field="price02","price02","decimal(12,2)","NOT NULL",,"","",$FFFFFFFF,""
+Field="delivery_fee","delivery_fee","decimal(12,2) unsigned",,,"","",$FFFFFFFF,""
+Field="visible","visible","tinyint(1)","NOT NULL",,"1","",$FFFFFFFF,""
+Field="(DC2Type","create_date","datetime","NOT NULL",,"","datetimetz)",$FFFFFFFF,""
+Field="(DC2Type","update_date","datetime","NOT NULL",,"","datetimetz)",$FFFFFFFF,""
+Field="currency_code","currency_code","varchar(255)",,,"","",$FFFFFFFF,""
+Field="point_rate","point_rate","decimal(10,0) unsigned",,,"","",$FFFFFFFF,""
+Field="discriminator_type","discriminator_type","varchar(255)","NOT NULL",,"","",$FFFFFFFF,""
+Index=IDX_1A11D1BA4584665A=0,product_id
+Index=IDX_1A11D1BAB0524E01=0,sale_type_id
+Index=IDX_1A11D1BA248D128=0,class_category_id1
+Index=IDX_1A11D1BA9B418092=0,class_category_id2
+Index=IDX_1A11D1BABA4269E=0,delivery_duration_id
+Index=IDX_1A11D1BA61220EA6=0,creator_id
+Index=dtb_product_class_price02_idx=0,price02
+Index=dtb_product_class_stock_stock_unlimited_idx=0,stock,stock_unlimited
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+Position="Main",1250,750
+
+[Entity]
+PName=mtb_tax_type
+LName=mtb_tax_type
+Comment=
+TableOption=
+Page=Main
+Left=950
+Top=50
+Field="id","id","smallint(5) unsigned","NOT NULL",0,"","",$FFFFFFFF,""
+Field="name","name","varchar(255)","NOT NULL",,"","",$FFFFFFFF,""
+Field="sort_no","sort_no","smallint(5) unsigned","NOT NULL",,"","",$FFFFFFFF,""
+Field="discriminator_type","discriminator_type","varchar(255)","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+Position="Main",950,50
+
+[Entity]
+PName=mtb_work
+LName=mtb_work
+Comment=
+TableOption=
+Page=Main
+Left=1250
+Top=50
+Field="id","id","smallint(5) unsigned","NOT NULL",0,"","",$FFFFFFFF,""
+Field="name","name","varchar(255)","NOT NULL",,"","",$FFFFFFFF,""
+Field="sort_no","sort_no","smallint(5) unsigned","NOT NULL",,"","",$FFFFFFFF,""
+Field="discriminator_type","discriminator_type","varchar(255)","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+Position="Main",1250,50
+
+[Relation]
+Entity1=dtb_product
+Entity2=dtb_product_class
+RelationType1=1
+RelationType2=3
+Fields1=id
+Fields2=product_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,4288,4711,4135,R,R
+Dependence=0
+Caption=
+PName=
+LineMode=0
+Bar1=429
+Bar2=471
+Bar3=414
+TermPos1=R
+TermPos2=R

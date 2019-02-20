@@ -14,28 +14,43 @@ ECのオープンソースプロダクトであるSpree及びEC-CUBEの商品マ
 Spreeでは、これら特性の違う商品を@<strong>{バリアント}と呼び、EC-CUBEでは@<strong>{規格}と呼んでいます。
 今後、商品バリエーションのことを、本書では@<strong>{商品規格}と呼ぶことにします(@<img>{ec-product-variant-pd1})。
 
-//image[ec-product-variant-pd1][商品と商品規格][scale=0.5]
+//image[ec-product-variant-pd1][商品と商品規格][scale=0.7]
 
 
-Spreeでは、商品と商品規格は@<img>{ec-product-variant-spree-p1}のような関係を持ちます。
-商品はproducts、商品規格はvariantsテーブルに持ちます。
+Spreeでは、商品と商品規格は@<img>{ec-product-variant-spree-real-product}のようなテーブルに持ちます。
+productsテーブルは商品を、variantsテーブルは商品規格を指しています。
 
-#@# ここは具体的なERに差し替える
-//image[ec-product-variant-spree-p1][Spreeの商品とバリエーションの関係][scale=0.5]
+//image[ec-product-variant-spree-real-product][Spreeの商品と商品規格の関係][scale=0.7]
 
-EC-CUBEでも、Spreeとテーブル名が異なるだけで@<img>{ec-product-variant-eccube-p1}のような関係のテーブルで
-商品と商品規格を持ちます。
+EC-CUBEでも、Spreeとテーブル名が異なるだけでproductテーブルとproduct_classテーブルの関係で
+商品と商品規格を持ちます(@<img>{ec-product-variant-eccube-real-product})。
 
-#@# ここは具体的なERに差し替える
-//image[ec-product-variant-eccube-p1][EC-CUBEの商品とバリエーションの関係][scale=0.5]
+//image[ec-product-variant-eccube-real-product][EC-CUBEの商品と商品規格の関係][scale=0.7]
 
 
 === 単品商品のデータのもたせ方
+
+商品規格を扱う必要がないとあらかじめわかっている場合は、規格テーブルをわざわざ持つ必要はありません。
+例えば書籍しか扱う予定がないECサイトの場合、書籍には規格という概念は必要ないため商品テーブルのみで事足ります。
+
+商品規格を扱う可能性がある場合、商品と商品規格は1対多の関係として持たせる必要があります。
+
+規格が存在する商品と単品で成り立つ商品が混在する場合、どのようにデータを持てばよいでしょうか。
+Spree/EC-CUBEともに単品のみの商品では、商品及び商品規格を1:1のレコードとして作成します。
+
+==== DISCUSSION: 単品商品の場合は商品テーブルにのみ、規格あり商品の場合には商品・商品規格両方にデータを入れるのはどうか
 
 #@# 単品でもかならずバリアントがある
 
 #@# バリエーションは必要か？例えばほんの通販ならばいらない。シリーズをまとめたい場合はその上にグルーピングのテーブルを作れば良い
 #@# バリエーションと間違えないように
 
+
+
+#@# SKUについてコラム
+
+=== 規格が複数存在する場合
+
+#@# EC-CUBEの設計のまずいところ
 
 == 商品価格のもたせ方
