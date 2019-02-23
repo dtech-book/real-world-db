@@ -1,0 +1,131 @@
+﻿# A5:ER FORMAT:12
+# A5:ER ENCODING:UTF8
+# A5:ER Mk-1 Copyright (C)2007 m.matsubara
+# A5:SQL Mk-2 Copyright (C)1997 m.matsubara
+#  http://www.wind.sannet.ne.jp/m_matsu/developer/a5m2/
+
+[Manager]
+ProjectName=
+Author=
+MaxEntityRowShow=1000
+ReadOnlyRecommend=0
+Page=Main
+PageInfo="Main",4,"A3Landscape",$FFFFFF
+LogicalView=1
+DecodeDomain=0
+ViewModePageIndividually=1
+ViewMode=4
+ViewFormat=0
+UseNondependenceDashLine=0
+FontName=Tahoma
+FontSize=6
+PaperSize=A4Landscape
+HeaderLeft=
+HeaderCenter=
+HeaderRight=
+FooterLeft=
+FooterCenter=
+FooterRight=
+ShowPageoutRelation=1
+RDBMSTypeName=Oracle Database
+DefaultPkName=%0:s_PKC
+DefaultPkIndexName=%0:s_PKI
+DefaultIndexName=%0:s_IX%1:d
+DefaultFkName=%0:s_FK%1:d
+SqlSeparator=0
+ShowTag=1
+ShowCommonAttributes=0
+
+[Entity]
+PName=spree_products
+LName=spree_products
+Comment=
+TableOption=
+Page=Main
+Left=300
+Top=200
+Field="id","id","int(11) auto_increment","NOT NULL",0,"","",$FFFFFFFF,""
+Field="name","name","varchar(255)","NOT NULL",,"","",$FFFFFFFF,""
+Field="description","description","text",,,"","",$FFFFFFFF,""
+Field="available_on","available_on","datetime",,,"","",$FFFFFFFF,""
+Field="discontinue_on","discontinue_on","datetime",,,"","",$FFFFFFFF,""
+Field="deleted_at","deleted_at","datetime",,,"","",$FFFFFFFF,""
+Field="slug","slug","varchar(255)",,,"","",$FFFFFFFF,""
+Field="meta_description","meta_description","text",,,"","",$FFFFFFFF,""
+Field="meta_keywords","meta_keywords","varchar(255)",,,"","",$FFFFFFFF,""
+Field="tax_category_id","tax_category_id","int(11)",,,"","",$FFFFFFFF,""
+Field="shipping_category_id","shipping_category_id","int(11)",,,"","",$FFFFFFFF,""
+Field="created_at","created_at","datetime(6)","NOT NULL",,"","",$FFFFFFFF,""
+Field="updated_at","updated_at","datetime(6)","NOT NULL",,"","",$FFFFFFFF,""
+Field="promotionable","promotionable","tinyint(1)",,,"1","",$FFFFFFFF,""
+Field="meta_title","meta_title","varchar(255)",,,"","",$FFFFFFFF,""
+Index=index_spree_products_on_slug=2,slug
+Index=index_spree_products_on_available_on=0,available_on
+Index=index_spree_products_on_deleted_at=0,deleted_at
+Index=index_spree_products_on_name=0,name
+Index=index_spree_products_on_shipping_category_id=0,shipping_category_id
+Index=index_spree_products_on_tax_category_id=0,tax_category_id
+Index=index_spree_products_on_discontinue_on=0,discontinue_on
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+Position="Main",300,200
+
+[Relation]
+Entity1=spree_products
+Entity2=spree_variants
+RelationType1=2
+RelationType2=4
+Fields1=id
+Fields2=id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,4022,5978,3886,R,R
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20190218015619
+LineMode=0
+Bar1=402
+Bar2=598
+Bar3=389
+TermPos1=R
+TermPos2=R
+
+[Entity]
+PName=spree_variants
+LName=spree_variants
+Comment=
+TableOption=
+Page=Main
+Left=850
+Top=200
+Field="id","id","int(11) auto_increment","NOT NULL",0,"","",$FFFFFFFF,""
+Field="sku","sku","varchar(255)","NOT NULL",,"","",$FFFFFFFF,""
+Field="weight","weight","decimal(8,2)",,,"\q0.00\q","",$FFFFFFFF,""
+Field="height","height","decimal(8,2)",,,"","",$FFFFFFFF,""
+Field="width","width","decimal(8,2)",,,"","",$FFFFFFFF,""
+Field="depth","depth","decimal(8,2)",,,"","",$FFFFFFFF,""
+Field="deleted_at","deleted_at","datetime",,,"","",$FFFFFFFF,""
+Field="discontinue_on","discontinue_on","datetime",,,"","",$FFFFFFFF,""
+Field="is_master","is_master","tinyint(1)",,,"0","",$FFFFFFFF,""
+Field="product_id","product_id","int(11)",,,"","",$FFFFFFFF,""
+Field="cost_price","cost_price","decimal(10,2)",,,"","",$FFFFFFFF,""
+Field="cost_currency","cost_currency","varchar(255)",,,"","",$FFFFFFFF,""
+Field="position","position","int(11)",,,"","",$FFFFFFFF,""
+Field="track_inventory","track_inventory","tinyint(1)",,,"1","",$FFFFFFFF,""
+Field="tax_category_id","tax_category_id","int(11)",,,"","",$FFFFFFFF,""
+Field="updated_at","updated_at","datetime","NOT NULL",,"","",$FFFFFFFF,""
+Field="created_at","created_at","datetime","NOT NULL",,"","",$FFFFFFFF,""
+Index=index_spree_variants_on_product_id=0,product_id
+Index=index_spree_variants_on_sku=0,sku
+Index=index_spree_variants_on_tax_category_id=0,tax_category_id
+Index=index_spree_variants_on_deleted_at=0,deleted_at
+Index=index_spree_variants_on_is_master=0,is_master
+Index=index_spree_variants_on_position=0,position
+Index=index_spree_variants_on_track_inventory=0,track_inventory
+Index=index_spree_variants_on_discontinue_on=0,discontinue_on
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+Position="Main",850,200
