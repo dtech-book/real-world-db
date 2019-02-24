@@ -5,6 +5,8 @@
   "filters": {},
   "rules": {
     "preset-ja-technical-writing": true,
+    "preset-japanese": true,
+    "textlint-rule-ja-yahoo-kousei": true,
     "max-ten": {
       "max": 5
     }

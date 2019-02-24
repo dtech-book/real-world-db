@@ -19,7 +19,9 @@
   "dependencies": {
     "textlint": "^11.2.3",
     "textlint-plugin-review": "^0.3.3",
+    "textlint-rule-ja-yahoo-kousei": "^1.0.3",
     "textlint-rule-preset-ja-spacing": "^2.0.1",
-    "textlint-rule-preset-ja-technical-writing": "^3.1.0"
+    "textlint-rule-preset-ja-technical-writing": "^3.1.0",
+    "textlint-rule-preset-japanese": "^4.0.0"
   }
 }
