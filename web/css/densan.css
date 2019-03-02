@@ -117,3 +117,7 @@ div .notice {
   max-width: 80%;
   margin: 20px auto;
 }
+
+.list {
+  margin-top: 10px;
+}
