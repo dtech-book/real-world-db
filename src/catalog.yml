@@ -6,6 +6,7 @@ CHAPS:
   - "ECシステムのDB設計":
     - ec-intro.re
     - ec-product-variant.re
+    - ec-category-hierarchy.re
 
 APPENDIX:
 
