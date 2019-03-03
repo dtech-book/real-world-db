@@ -262,10 +262,10 @@ STI(単一テーブル継承)は、ひとつのテーブルに関連するすべ
 //list[ec-product-variant-sti-table-schema][STIを使った商品テーブル設計][SQL]{
   CREATE TABLE `products` (
     `id` INT(11)                NOT NULL AUTO_INCREMENT,
-    `type` VARCHAR(20)          NOT NULL, -- サブタイプを認識するために利用 'Cloth' または 'Food' が入る
+    `type` VARCHAR(20)          NOT NULL, -- サブタイプを認識するために利用 'Clothing' または 'Food' が入る
     `name` VARCHAR(255)         NOT NULL, -- 商品名
-    `brand` VARCHAR(255)                , -- ブランド名 Clothのみ使う
-    `manufacturer` VARCHAR(255)         , -- 製造元 Clothのみ使う
+    `brand` VARCHAR(255)                , -- ブランド名 Clothingのみ使う
+    `manufacturer` VARCHAR(255)         , -- 製造元 Clothingのみ使う
     `preservation` VARCHAR(255)         , -- 保存方法 Foodのみ使う
     `allergens`    VARCHAR(255)         , -- アレルギー表示 Foodのみ使う
     `best_before`  INT(11)                -- 賞味期限(製造日からの日数) Foodのみ使う
@@ -294,10 +294,10 @@ STI(単一テーブル継承)は、ひとつのテーブルに関連するすべ
 ==== CCI / 具象テーブル継承
 
 CCI(具象テーブル継承)では、各サブタイプごとにテーブルを作成します。
-衣類(Cloth)と食品(Food)の商品が必要ならば、@<list>{ec-product-variant-cci-table-schema}、@<img>{ec-product-variant-cci-data}のように2つのテーブルを作成します。
+衣類(Clothing)と食品(Food)の商品が必要ならば、@<list>{ec-product-variant-cci-table-schema}、@<img>{ec-product-variant-cci-data}のように2つのテーブルを作成します。
 
 //list[ec-product-variant-cci-table-schema][CCIを使った商品テーブル設計][SQL]{
-  CREATE TABLE `clothes` (
+  CREATE TABLE `clothings` (
     `id` INT(11)                NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255)         NOT NULL, -- 商品名
     `brand` VARCHAR(255)        NOT NULL, -- ブランド名
@@ -328,14 +328,14 @@ CCI(具象テーブル継承)では、各サブタイプごとにテーブルを
  ** サブタイプをまたいだ検索がしにくい
  *** すべての商品を取得といった処理をするためには、テーブルをUNIONで結合する必要があります
  ** STIに比べアプリケーション側の実装が複雑になる可能性がある
- *** 例えば商品をカートに入れるという操作が必要な場合、カートに入れる商品の参照先が clothesまたはfoodsである必要があります
+ *** 例えば商品をカートに入れるという操作が必要な場合、カートに入れる商品の参照先が clothingsまたはfoodsである必要があります
 
 
 ==== CTI / クラステーブル継承
 
 CTI(クラステーブル継承)では、スーパータイプ、サブタイプそれぞれに対してテーブルを作成します。
 具体的には、@<list>{ec-product-variant-cti-table-schema}および@<img>{ec-product-variant-cti-data}のように、
-スーパータイプである商品(products)テーブルと、サブタイプである衣類(clothes)・食品(foods)の3テーブルを作成します。
+スーパータイプである商品(products)テーブルと、サブタイプである衣類(clothings)・食品(foods)の3テーブルを作成します。
 
 //list[ec-product-variant-cti-table-schema][CTIを使った商品テーブル設計][SQL]{
   CREATE TABLE `products` (
@@ -343,7 +343,7 @@ CTI(クラステーブル継承)では、スーパータイプ、サブタイプ
     `name` VARCHAR(255)         NOT NULL, -- 商品名
   );
 
-  CREATE TABLE `clothes` (
+  CREATE TABLE `clothings` (
     `id` INT(11)                 NOT NULL AUTO_INCREMENT,
     `product_id`   INT(11)       NOT NULL, -- 商品ID
     `brand`        VARCHAR(255)  NOT NULL, -- ブランド名
