@@ -224,18 +224,18 @@ SpreeはECサイトを作るプラットフォームであり、商品にどん�
 === 動的な属性の変化をデータベースでサポートできるか
 
 リレーショナルデータベースでは、動的な属性の変化をサポートできません。
-データ量が多く、項目が自由に変化する可能性のあるデータを扱わなければならない場合、リレーショナルデータベース以外を使うべきか検討する必要があります。
+データ量が多く、項目が自由に変化する可能性のあるデータを扱わなければならない場合、リレーショナルデータベースを使うべきか検討する必要があります。
 
 MongoDB、Amazon DynamoDBのようなスキーマレスデータベースを使うと、スキーマの定義を必要とせずにデータの追加・変更・削除ができます。
 
 
-=== 持つべき属性があらかじめ決まっている場合
+=== 継承を用いた商品テーブル設計
 
 ECで扱う商品の属性があらかじめ決まっている場合、EAVを選択する理由はありません。
 
-例えば、扱う商品は服と食品だけと、あらかじめ分かっているとします。
+例えば、扱う商品は衣類と食品だけと、あらかじめ分かっているとします。
 
- * 商品カテゴリが服の場合
+ * 商品カテゴリが衣類の場合
  ** 属性としてブランド名、製造元を持つ
  * 商品カテゴリが食品の場合
  ** 属性として保存方法、アレルギー情報、賞味期限(製造日からの日数)を持つ
@@ -243,11 +243,158 @@ ECで扱う商品の属性があらかじめ決まっている場合、EAVを選
 この場合、以下戦略をとることができます。
 
  * STI (Single Table Inheritance / 単一テーブル継承)
- * CTI (Class Table Inheritance / クラステーブル継承)
  * CCI (Concrete Class Inheritance / 具象テーブル継承)
+ * CTI (Class Table Inheritance / クラステーブル継承)
+
+商品全体に共通で持つ項目を集めたスーパータイプと、各商品に固有の情報を保持するサブタイプを用いてデータを表現します(@<img>{ec-product-variant-table-inheritance})。
+これはオブジェクト指向における基底クラスと派生クラスのような継承関係を用いるのに似ています。
+
+STI・CCI・CTIは、これらの継承関係を具体的なテーブルに落とし込むための手法です。
+
+//image[ec-product-variant-table-inheritance][スーパータイプとサブタイプ]
 
 
 ==== STI / 単一テーブル継承
 
-STI(単一テーブル継承)は、ひとつのテーブルに関連するすべての属性を格納します。
-また、各レコードが表すサブタイプを識別するための値をもつ必要があります。
+STI(単一テーブル継承)は、ひとつのテーブルに関連するすべての属性を格納します(@<list>{ec-product-variant-sti-table-schema}、@<img>{ec-product-variant-sti-data})。
+また、各レコードのサブタイプを識別する値をもつ必要があります。
+
+//list[ec-product-variant-sti-table-schema][STIを使った商品テーブル設計][SQL]{
+  CREATE TABLE `products` (
+    `id` INT(11)                NOT NULL AUTO_INCREMENT,
+    `type` VARCHAR(20)          NOT NULL, -- サブタイプを認識するために利用 'Cloth' または 'Food' が入る
+    `name` VARCHAR(255)         NOT NULL, -- 商品名
+    `brand` VARCHAR(255)                , -- ブランド名 Clothのみ使う
+    `manufacturer` VARCHAR(255)         , -- 製造元 Clothのみ使う
+    `preservation` VARCHAR(255)         , -- 保存方法 Foodのみ使う
+    `allergens`    VARCHAR(255)         , -- アレルギー表示 Foodのみ使う
+    `best_before`  INT(11)                -- 賞味期限(製造日からの日数) Foodのみ使う
+  );
+//}
+
+//image[ec-product-variant-sti-data][STIを使った商品データの持ち方]
+
+
+ * STIのメリット
+ ** EAVと違い、データの型を定義できる
+ *** 不正なデータが入り込む可能性を抑えられます
+ ** テーブル設計がシンプル
+ *** 他の戦略(CCI / CTI)に比べてデータの持ち方がシンプルです
+ ** サブタイプをまたいだデータの検索がしやすい
+ *** すべてのサブタイプのデータが1つのテーブルに入っているため、サブタイプすべてのレコードを取得・検索といった処理がしやすいです
+ * STIのデメリット
+ ** サブタイプがどの属性を持つべきかの情報を持っていない
+ *** 衣類であったら ブランド名、製造元 カラムを持たなければならないという情報は、テーブル設計を見てもわかりません
+ ** 必須カラムを設定できない
+ *** あるサブタイプが持つ値は、別のサブタイプではNULLを入れざるを得ません。このため、サブタイプ固有の属性にNOT NULL制約をかけることができません
+ ** テーブルが横に長くなる
+ *** サブタイプの種類が多く属性も多い場合は、テーブルのカラム数が多くなってしまいます
+
+
+==== CCI / 具象テーブル継承
+
+CCI(具象テーブル継承)では、各サブタイプごとにテーブルを作成します。
+衣類(Cloth)と食品(Food)の商品が必要ならば、@<list>{ec-product-variant-cci-table-schema}、@<img>{ec-product-variant-cci-data}のように2つのテーブルを作成します。
+
+//list[ec-product-variant-cci-table-schema][CCIを使った商品テーブル設計][SQL]{
+  CREATE TABLE `clothes` (
+    `id` INT(11)                NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255)         NOT NULL, -- 商品名
+    `brand` VARCHAR(255)        NOT NULL, -- ブランド名
+    `manufacturer` VARCHAR(255) NOT NULL  -- 製造元
+  );
+
+  CREATE TABLE `foods` (
+    `id` INT(11)                NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255)         NOT NULL, -- 商品名
+    `preservation` VARCHAR(255) NOT NULL, -- 保存方法
+    `allergens`    VARCHAR(255) NOT NULL, -- アレルギー表示
+    `best_before`  INT(11)      NOT NULL  -- 賞味期限(製造日からの日数)
+  );
+//}
+
+
+//image[ec-product-variant-cci-data][CCIを使った商品データの持ち方]
+
+
+ * CCIのメリット
+ ** サブタイプがどの属性を持つべきか、テーブル設計を見るとわかる
+ ** サブタイプ固有の属性にNOT NULL制約をかけることができる
+ ** 1テーブルあたりのデータ量をSTIに比べて抑えることができる
+ * CCIのデメリット
+ ** スーパータイプの項目(すべての商品に共通の項目)が何なのか、テーブル設計を見てもわからない
+ ** スーパータイプの項目にUNIQUE制約をかけることができない
+ *** 商品名はすべてのサブタイプをまたいで固有である必要がある、といった制約をデータベースレベルでかけることができません
+ ** サブタイプをまたいだ検索がしにくい
+ *** すべての商品を取得といった処理をするためには、テーブルをUNIONで結合する必要があります
+ ** STIに比べアプリケーション側の実装が複雑になる可能性がある
+ *** 例えば商品をカートに入れるという操作が必要な場合、カートに入れる商品の参照先が clothesまたはfoodsである必要があります
+
+
+==== CTI / クラステーブル継承
+
+CTI(クラステーブル継承)では、スーパータイプ、サブタイプそれぞれに対してテーブルを作成します。
+具体的には、@<list>{ec-product-variant-cti-table-schema}および@<img>{ec-product-variant-cti-data}のように、
+スーパータイプである商品(products)テーブルと、サブタイプである衣類(clothes)・食品(foods)の3テーブルを作成します。
+
+//list[ec-product-variant-cti-table-schema][CTIを使った商品テーブル設計][SQL]{
+  CREATE TABLE `products` (
+    `id` INT(11)                NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255)         NOT NULL, -- 商品名
+  );
+
+  CREATE TABLE `clothes` (
+    `id` INT(11)                 NOT NULL AUTO_INCREMENT,
+    `product_id`   INT(11)       NOT NULL, -- 商品ID
+    `brand`        VARCHAR(255)  NOT NULL, -- ブランド名
+    `manufacturer` VARCHAR(255)  NOT NULL, -- 製造元
+    FOREIGN KEY (`product_id`) REFERENCES `products`(`id`)
+  );
+
+  CREATE TABLE `foods` (
+    `id` INT(11)                NOT NULL AUTO_INCREMENT,
+    `product_id`   INT(11)      NOT NULL, -- 商品ID
+    `preservation` VARCHAR(255) NOT NULL, -- 保存方法
+    `allergens`    VARCHAR(255) NOT NULL, -- アレルギー表示
+    `best_before`  INT(11)      NOT NULL, -- 賞味期限(製造日からの日数)
+    FOREIGN KEY (`product_id`) REFERENCES `products`(`id`)
+  );
+//}
+
+
+//image[ec-product-variant-cti-data][CTIを使った商品データの持ち方]
+
+
+ * CTIのメリット
+ ** スーパータイプ・サブタイプそれぞれがどの属性を持つべきか、テーブル設計を見るとわかる
+ ** スーパータイプ・サブタイプそれぞれの属性に、NOT NULL制約やUNIQUE制約をかけることができる
+ * CTIのデメリット
+ ** レコードを取得するために常にJOINが必要となる
+ *** JOINの回数が増えればふえるほど、パフォーマンス上の問題が発生する恐れがあります
+ ** 1テーブルあたりのデータ量はCCIに比べて多くなる
+ *** 商品(products)テーブルはすべてのサブタイプのレコードをもつ必要があり、レコード数が増える傾向にあります
+
+
+==== テーブル継承のまとめ
+
+STI・CCI・CTIの特徴は、@<table>{ec-product-variant-inheritance-merideri}のとおりです。
+
+//table[ec-product-variant-inheritance-merideri][STI・CCI・CTIの比較]{
+特徴		STI		CCI 		CTI
+--------------------------------------------
+サブタイプの項目ごとにデータ型を定義できる		○		○ 	○
+テーブル設計・アプリケーションの実装がシンプル		○		× 	×
+サブタイプをまたいだデータ取得がしやすい		○		× 	×
+1テーブルあたりの列数を少なくできる		×		○ 	○
+1テーブルあたりの行数を少なくできる		×		○ 	×
+サブタイプが持つ属性がテーブル設計からわかる		×		○ 	○
+スーパータイプが持つ属性(共通項目)がテーブル設計からわかる		×		× 	○
+スーパータイプの属性にUNIQUE制約を設定できる		○		× 	○
+サブタイプの属性ごとにNOT NULL制約を設定できる		×		○ 	○
+//}
+
+どの設計が最適かは、どのような属性をもったデータを扱うか・扱うデータ量はどのくらいか・実装をシンプルにしたいか
+によっても変わってきます。
+
+カテゴリーごとに固有の属性を持った商品テーブルを扱う場合は、
+@<table>{ec-product-variant-inheritance-merideri}をみながらどのような手法を選択するのがよいのか検討してみてください。

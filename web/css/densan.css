@@ -114,10 +114,44 @@ div .notice {
 }
 
 .image img {
-  max-width: 80%;
+  max-width: 95%;
   margin: 20px auto;
 }
 
 .list {
   margin-top: 10px;
+}
+
+table {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  background-color: transparent;
+  display: table;
+  border-spacing: 2px;
+}
+
+thead {
+  background-color: grey;
+  color: white;
+}
+
+tbody {
+  vertical-align: middle;
+}
+
+tr {
+  border: 1px grey solid;
+}
+
+.book th {
+  padding: 5px !important;
+  background-color: grey;
+  color: white;
+  font-weight: bold;
+}
+
+.book td {
+  padding: 5px !important;
 }
