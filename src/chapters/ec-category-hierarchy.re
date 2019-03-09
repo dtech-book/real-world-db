@@ -32,8 +32,135 @@ EC-CUBEは、カテゴリーを@<img>{ec-category-hierarchy-ec-cube-naive-with-t
 
 == Spreeのカテゴリー設計
 
+SPREEは、カテゴリーを@<img>{ec-category-hierarchy-spree-cset}のようなテーブルで表現します。
+このモデルは、@<b>{隣接リスト}と@<b>{入れ子集合(Nested Set)}を組み合わせたものです。
 
 //image[ec-category-hierarchy-spree-cset][Spreeのカテゴリー設計]
 
+隣接リストはEC-CUBEのカテゴリーテーブルでも利用されていましたが、入れ子集合モデルとはなんでしょうか。
+入れ子集合では、left/rightという2つの値を用いて階層を表現します。
+このモデルは木構造を集合を用いて表現するため、一見すると分かりづらいかと思われます。
+
+入れ子集合モデルの利点欠点、データ取得方法については、後述の@<hd>{ec-category-hierarchy|階層型データを格納するためのモデル設計}にて詳しく解説します。
+
+Spreeは入れ子集合のデータ検索の欠点を補うために、さらに隣接リストも組み合わせるモデルを採用しています。
 
 == 階層型データを格納するためのモデル設計
+
+EC-CUBEおよびSpreeにて使われている@<b>{隣接リスト}および@<b>{入れ子集合(Nested Set)}は、いずれもデータベースで木構造を表現するためのデータモデルです。
+木構造を表現する方法は、他に@<b>{閉包テーブル(Closure Tree)}と呼ばれるモデルもあります。
+
+これらのモデルを説明するまえに、木構造の基本をおさらいしておきます。
+
+木構造はグラフの一種です。
+グラフとは、@<img>{ec-category-hierarchy-graph}のように、ノード（頂点）とエッジ（辺）のペアで構成されるデータ構造です。
+
+//image[ec-category-hierarchy-graph][グラフ構造]
+
+@<img>{ec-category-hierarchy-graph}のグラフは閉路を持ったグラフです。
+ノードaからたどり、a -> e -> c -> a と移動すると元の場所に戻ることができます。これを閉路をもつグラフと呼びます。
+
+また、エッジの向きが存在しない事を、無向グラフと呼びます。
+無向グラフでは、a -> e と移動できますし、e -> a と逆にたどる事もできます。
+反対に、エッジの向きを制限するグラフは有向グラフと呼ばれます。a -> e と移動できても、e -> a という移動は制限するようなグラフです。
+
+一方、木構造は@<img>{ec-category-hierarchy-tree}のような閉路を持たない有向グラフです。
+各ノードには親と子の関係があります。
+@<b>{木構造は閉路を持たない}ということが重要です。
+これから紹介する隣接リストおよび閉包テーブル(Closure Tree)は、閉路を持たないことはアプリケーションレベルで保証しなければなりません。
+
+//image[ec-category-hierarchy-tree][木構造]
+
+隣接リスト、入れ子集合(Nested Set)、閉包テーブル(Closure Tree)のうち、
+どのモデルを採用するかは、扱うデータ・アプリケーションの性質やRDBで再帰クエリをサポートしているかによって変わります。
+どれが良い悪いではなく、これらのモデルの長所短所を正しく理解し、構築するシステムに合わせた最適なモデルを選択しましょう。
+
+=== 隣接リスト
+
+隣接リストは、紹介するモデルの中で最もシンプルなデータ構造を持ちます。
+各レコードに親のノードIDを含めてデータを表現します(@<img>{ec-category-hierarchy-naive-tree-model})。
+
+//image[ec-category-hierarchy-naive-tree-model][隣接リスト]
+
+
+隣接リストは、@<list>{ec-product-variant-naive-tree-create}のSQLにて表すことができます。
+
+//list[ec-product-variant-naive-tree-create][隣接リストのテーブル設計][SQL]{
+  CREATE TABLE `categories` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `parent_id` int(11) DEFAULT NULL,
+    `name` varchar(255) NOT NULL,
+    PRIMARY KEY (`id`)
+  );
+//}
+
+隣接リストを用いた場合、指定したカテゴリーの直近の子または親を取得するのは簡単です。
+例えば、「食品」カテゴリーの子レコードは@<list>{ec-product-variant-naive-tree-child}のSQLで取得できます。
+
+//list[ec-product-variant-naive-tree-child][「食品」カテゴリーの子レコードを取得する][SQL]{
+  SELECT c1.*
+  FROM categories c1
+  WHERE parent_id = 2;
+//}
+
+指定ノード配下のすべてのレコードを取得するためには、再帰SQL(WITH RECURSIVE)を用いる必要があります。
+WITH RECURSIVEクエリは、PostgreSQL8.4以上、MySQLだと8.0以上でサポートされています。
+またOracleやSQL Serverなどの商用RDBでもサポートされています。
+
+WITH RECURSIVEを用いると、@<list>{ec-product-variant-naive-tree-with-recursive}のように、
+「カテゴリー」配下のレコードを取得できます。
+
+//list[ec-product-variant-naive-tree-with-recursive][再帰クエリを用いた配下のレコードの取得][SQL]{
+  WITH RECURSIVE tcat(id, parent_id, name) AS (
+    SELECT c1.id, c1.parent_id, c1.name
+    FROM categories c1
+    WHERE c1.parent_id IS NULL -- 「カテゴリー」配下を取得する
+
+    UNION ALL
+
+    SELECT c2.id, c2.parent_id, c2.name
+    FROM categories c2
+    INNER JOIN tcat ON tcat.id = c2.parent_id
+  )
+  SELECT * FROM tcat;
+//}
+
+
+RDBが再帰クエリをサポートしていない場合、配下や先祖のレコードを取得するのは困難です。
+木構造の階層が2段であれば、@<list>{ec-product-variant-naive-tree-depth2}のようなSQLでデータを取得できます。
+
+//list[ec-product-variant-naive-tree-depth2][2階層下までのレコードを取得][SQL]{
+  SELECT c1.*, c2.*
+  FROM   categories c1
+         LEFT OUTER JOIN categories c2
+                      ON c2.parent_id = c1.id
+  WHERE  c1.parent_id IS NULL; -- 「カテゴリー」配下を取得する
+//}
+
+3階層下までレコードを取得するためには、さらにテーブルをJOINする必要があります。
+
+//list[ec-product-variant-naive-tree-depth2][3階層下までのレコードを取得][SQL]{
+  SELECT c1.*, c2.*, c3.*
+  FROM   categories c1
+         LEFT OUTER JOIN categories c2
+                      ON c2.parent_id = c1.id
+         LEFT OUTER JOIN categories c3
+                      ON c3.parent_id = c2.id
+  WHERE  c1.parent_id IS NULL; -- 「カテゴリー」配下を取得する
+//}
+
+再帰クエリを利用しない場合、取得可能な階層数に上限をもうける必要があります。
+このため、再帰クエリをサポートしていない場合は、隣接リストの採用はおすすめできません。
+
+
+隣接リストのメリット・デメリットは次のとおりです。
+
+ * 隣接リストのメリット
+ ** データ構造がシンプルである
+ ** データの挿入、削除が簡単である
+ ** 自ノードの直近の親、子を簡単に取得できる
+ * 隣接リストのデメリット
+ ** 再帰クエリをサポートしていないRDBだと、自ノードの子孫をすべて取得する、または先祖を取得するといった検索が困難である
+
+
+=== 入れ子集合 (Nested Set)
