@@ -48,7 +48,7 @@ Spreeは入れ子集合のデータ検索の欠点を補うために、さらに
 == 階層型データを格納するためのモデル設計
 
 EC-CUBEおよびSpreeにて使われている@<b>{隣接リスト}および@<b>{入れ子集合(Nested Set)}は、いずれもデータベースで木構造を表現するためのデータモデルです。
-木構造を表現する方法は、他に@<b>{閉包テーブル(Closure Tree)}と呼ばれるモデルもあります。
+木構造を表現する方法は、他に@<b>{クロージャーテーブル}と呼ばれるモデルもあります。
 
 これらのモデルを説明するまえに、木構造の基本をおさらいしておきます。
 
@@ -71,7 +71,7 @@ EC-CUBEおよびSpreeにて使われている@<b>{隣接リスト}および@<b>{
 
 //image[ec-category-hierarchy-tree][木構造]
 
-隣接リスト、入れ子集合(Nested Set)、閉包テーブル(Closure Tree)のうち、
+隣接リスト、入れ子集合(Nested Set)、クロージャーテーブルのうち、
 どのモデルを採用するかは、扱うデータ・アプリケーションの性質やRDBで再帰クエリをサポートしているかによって変わります。
 どれが良い悪いではなく、これらのモデルの長所短所を正しく理解し、構築するシステムに合わせた最適なモデルを選択しましょう。
 
@@ -239,3 +239,128 @@ Spreeの商品カテゴリーテーブルでは、入れ子集合に隣接リス
   * 入れ子集合のデメリット
   ** ノードの追加・削除が難しい。最悪のケースでは、すべてのレコードを更新する必要がある
   ** 直近の親または子ノードを簡単に取得できない
+
+
+
+=== クロージャーテーブル
+
+最後に紹介するのは、クロージャーテーブルと呼ばれるモデルです。
+
+EC-CUBE、Spreeともにクロージャーテーブルは使われていませんでしたが、
+このモデルは構造がシンプルで、データの追加・削除といった操作が簡単にできます。
+また、子孫・先祖すべてを取得といった操作がしやすいという特徴を持っています。
+反面、ノードの数が多いとデータ量が多くなとなるというデメリットもあります。
+
+クロージャーテーブルでは、各ノードの直近の親・子の関係だけでなく、
+ノードは自分自身と子孫すべての接続情報をテーブルに持ちます(@<img>{ec-category-hierarchy-closure-tree-data})。
+また、この接続情報を格納する別のテーブルが必要です(@<list>{ec-category-hierarchy-closure-tree-def})。
+
+
+//image[ec-category-hierarchy-closure-tree-data][クロージャーテーブル]
+
+//list[ec-category-hierarchy-closure-tree-def][クロージャーテーブルのテーブル設計][SQL]{
+  -- カテゴリーテーブル
+  CREATE TABLE `categories` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL,
+    PRIMARY KEY (`id`)
+  );
+
+  -- ノードの接続情報を格納するテーブル
+  CREATE TABLE `category_tree_paths` (
+    `ancestor` int(11) NOT NULL,
+    `descendant` int(11) NOT NULL,
+    PRIMARY KEY (`ancestor`, `descendant`)
+  );
+//}
+
+クロージャーテーブルでは、子孫または先祖のノードをすべて取得するといった操作が簡単にできます。
+例えば、「カテゴリー」ノード(ID: 1)の子孫をすべて取得する場合は、
+@<list>{ec-category-hierarchy-closure-tree-desc-fetch}のようにしてレコードを取得します。
+
+//list[ec-category-hierarchy-closure-tree-desc-fetch][クロージャーテーブルから特定ノードの子孫をすべて取得する][SQL]{
+  SELECT c.*
+  FROM `categories` c
+  INNER JOIN `category_tree_paths` t ON c.id = t.descendant
+  WHERE t.ancestor = 1; -- id = 1 は 「カテゴリー」
+//}
+
+
+ノードの追加は簡単にできます。
+「スイーツ」カテゴリーの下に新たに「アイスクリーム」というノード(ID: 11)を足したい場合は、
+@<list>{ec-category-hierarchy-closure-tree-add}のように自分自身への参照を追加します。
+その上で、自身の先祖にあたるノードすべてに対して、
+@<list>{ec-category-hierarchy-closure-tree-add}のようにレコードを追加します。
+
+//list[ec-category-hierarchy-closure-tree-add][クロージャーテーブルへのレコードの追加][SQL]{
+  INSERT INTO `categories`(`id`, `name`)
+  VALUES (11, "アイスクリーム");
+
+  -- 自ノードへの参照は必ず必要
+  INSERT INTO `category_tree_paths`(`ancestor`, `descendant`)
+  VALUES (11, 11);
+
+  -- 自身の直近の親の子孫すべての関連を追加
+  INSERT INTO `category_tree_paths`(`ancestor`, `descendant`)
+    SELECT t.ancestor, 11
+    FROM `category_tree_paths` t
+    WHERE t.descendant = 3; -- id = 3 はスイーツ
+//}
+
+ノードを削除したい場合は、@<list>{ec-category-hierarchy-closure-tree-delete}のように
+子孫として参照している行をすべて削除するだけです。
+
+//list[ec-category-hierarchy-closure-tree-delete][クロージャーテーブルのレコード削除][SQL]{
+  -- id: 11を削除したい場合
+  DELETE FROM `category_tree_paths`
+  WHERE descendant = 11;
+
+  DELETE FROM `categories`
+  WHERE id = 11;
+//}
+
+直近の親や子を取得するといった操作は、このテーブル構造のままではできません。
+しかし、category_tree_pathsテーブルにノード間の距離情報を格納しておくことで、簡単にデータを取得できます。
+例えば、食品(ID: 2)とスイーツ(ID:3)、お酒(ID: 5)の距離は1といった情報をpath_lengthカラムに格納しておくことで、
+@<list>{ec-category-hierarchy-closure-tree-path-length}のようにして食品の直近の子を取得できます。
+
+//list[ec-category-hierarchy-closure-tree-path-length][ノード間距離を使った子ノードの取得][SQL]{
+  SELECT c.*
+  FROM `categories` c
+  INNER JOIN `category_tree_paths` t ON c.id = t.descendant
+  WHERE t.ancestor = 2 AND t.path_length = 1; -- ID: 2 は「食品」
+//}
+
+
+クロージャーテーブルのメリット・デメリットは次のとおりです。
+
+ * クロージャーテーブルのメリット
+ ** テーブル構造がシンプルで直感的に理解しやすい
+ ** 子孫・先祖すべてを取得するといった操作がしやすい
+ ** 直近の親・子を取得するといった操作がしやすい
+ ** データの挿入、削除が簡単にできる
+ * クロージャーテーブルのデメリット
+ ** ノード数が増えるとテーブルの行数が多くなる
+
+
+=== 階層型データモデルの設計まとめ
+
+隣接リスト・入れ子集合(Nested Set)・クロージャーテーブルの特徴は、@<table>{ec-category-hierarchy-merideri}のとおりです。
+
+//table[ec-category-hierarchy-merideri][階層型データモデルの設計まとめ]{
+モデル		親・子の取得		子孫・先祖の取得		データ追加・削除		データ量
+--------------------------------------------------------------------
+隣接リスト		簡単		(再帰クエリ無しだと)難しい		簡単		ノード数と同じ
+入れ子集合 (Nested Set)		難しい		簡単		難しい	ノード数と同じ
+クロージャーテーブル		簡単		簡単	簡単	ノード数×子孫の数
+//}
+
+RDBではグラフ構造を扱うことが難しいことを忘れないでください。
+どのモデルを選択したとしても、木構造の定義が崩れていないかはデータベースレベルで保証することはできず、
+アプリケーションレベルで担保する必要があります。
+例えば隣接リストで閉路が存在している状態で再帰クエリを発行すると、SQLエラーとなってしまいます。
+
+複雑なグラフ構造、木構造を扱わなければいけない場合は、RDB以外を選択することも考えましょう。
+例えばグラフデータベースを利用すれば、もっとシンプルにデータを表現できます。
+
+今回紹介したどのモデルにもメリット・デメリットがあります。扱うデータの性質を見極めて、最適なモデルを選択してみてください。
