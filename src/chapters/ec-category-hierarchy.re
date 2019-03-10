@@ -64,10 +64,10 @@ EC-CUBEおよびSpreeにて使われている@<b>{隣接リスト}および@<b>{
 無向グラフでは、a -> e と移動できますし、e -> a と逆にたどる事もできます。
 反対に、エッジの向きを制限するグラフは有向グラフと呼ばれます。a -> e と移動できても、e -> a という移動は制限するようなグラフです。
 
-一方、木構造は@<img>{ec-category-hierarchy-tree}のような閉路を持たない有向グラフです。
+木構造は@<img>{ec-category-hierarchy-tree}のような閉路を持たない有向グラフです。
 各ノードには親と子の関係があります。
 @<b>{木構造は閉路を持たない}ということが重要です。
-これから紹介する隣接リストおよび閉包テーブル(Closure Tree)は、閉路を持たないことはアプリケーションレベルで保証しなければなりません。
+これから紹介するモデルでは、閉路を持たないことはアプリケーションレベルで保証しなければなりません。
 
 //image[ec-category-hierarchy-tree][木構造]
 
@@ -164,3 +164,78 @@ RDBが再帰クエリをサポートしていない場合、配下や先祖の�
 
 
 === 入れ子集合 (Nested Set)
+
+入れ子集合は、木構造を集合を用いて表すデータ構造です。
+@<img>{ec-category-hierarchy-nested-set-graph}のように親ノードの中に子ノードが含まれると考えてデータを格納します。
+
+
+//image[ec-category-hierarchy-nested-set-graph][入れ子集合を用いた木構造の表現]
+
+各集合には、left / right という2つの値を割り当てます。
+例えば、「食品」というカテゴリーにはleft=2、right=9 という値を割り当て、「食品」カテゴリー内のスイーツにはleft=3、right=6という値を割り当てます。
+この状態で「食品」カテゴリーの子ノードは「スイーツ」であると表現します。
+子ノードのleftの値は必ず親ノードのleftよりも大きく、また子ノードのrightの値は親ノードのrightよりも小さくなります。
+
+入れ子集合を木構造になおすと、@<img>{ec-category-hierarchy-nested-set-tree}および@<img>{ec-category-hierarchy-nested-set-data}
+のように各ノードにleft/rightの値を割り付けます。
+これで各集合をテーブルで表現できます。
+
+
+//image[ec-category-hierarchy-nested-set-tree][入れ子集合を用いた木構造の表現]
+
+//image[ec-category-hierarchy-nested-set-data][入れ子集合を用いた木構造の表現]
+
+
+入れ子集合で指定ノードの配下のレコードをすべて取得するのは簡単です。
+@<list>{ec-category-hierarchy-nested-set-table}のようなテーブルに対して、
+@<list>{ec-category-hierarchy-nested-set-descendant}のクエリで、「カテゴリー」配下のノードをすべて取得できます。
+
+//list[ec-category-hierarchy-nested-set-table][入れ子集合のテーブル設計][SQL]{
+  CREATE TABLE `categories` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL,
+    `left` int(11) NOT NULL,
+    `right` int(11) NOT NULL,
+    PRIMARY KEY (`id`)
+  );
+//}
+
+
+//list[ec-category-hierarchy-nested-set-descendant][入れ子集合の指定ノード配下のレコードをすべて取得する][SQL]{
+  SELECT     c1_child.*
+  FROM       categories c1_child
+  INNER JOIN categories c2_parent
+  WHERE      c2_parent.id = 1 -- id = 1 は「カテゴリー」ノード
+  AND        c1_child.left BETWEEN c2_parent.left AND c2_parent.right;
+//}
+
+
+指定ノードの先祖も@<list>{ec-category-hierarchy-nested-set-ascendant}のクエリで簡単に取得できます。
+
+//list[ec-category-hierarchy-nested-set-ascendant][入れ子集合の先祖ノードをすべて取得する][SQL]{
+  SELECT     c1_parent.*
+  FROM       categories c1_parent
+  INNER JOIN categories c2_child
+  WHERE      c2_child.id = 15 -- id = 15 は「チョコレート」ノード
+  AND        c1_parent.left < c2_child.left AND c1_parent.right > c2_child.right;
+//}
+
+
+入れ子集合では、自ノードの子孫または先祖すべてを取得するといった検索を簡単に行うことができる反面、
+ノードの追加・削除が難しいというデメリットもあります。
+ノードの追加・削除が発生すると、最悪のケースではカテゴリーテーブルのレコード全体のleft/right値を更新しなおさなければならないためです。
+
+また指定カテゴリーの直近の親または子を取得するといったクエリは、簡単に書くことができません。
+Spreeの商品カテゴリーテーブルでは、入れ子集合に隣接リストのモデルも組み合わせることで、この問題を解決しています。
+
+カテゴリーの更新が少なく、特定カテゴリー配下または先祖のすべてのレコードを取得するといった操作が多い場合は
+入れ子集合モデルを採用してもよいでしょう。
+
+
+入れ子集合モデルのメリット・デメリットは次のとおりです。
+
+  * 入れ子集合のメリット
+  ** 自ノード配下または先祖のレコードすべてを簡単に取得できる
+  * 入れ子集合のデメリット
+  ** ノードの追加・削除が難しい。最悪のケースでは、すべてのレコードを更新する必要がある
+  ** 直近の親または子ノードを簡単に取得できない
