@@ -155,3 +155,8 @@ tr {
 .book td {
   padding: 5px !important;
 }
+
+.toc-button {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}

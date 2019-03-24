@@ -57,12 +57,12 @@ end
         <div class="col-xs-12">
           <div class="btn-group btn-group-justified mb-30">
             <% if @prev.present? %>
-              <a href="<%= h(@prev.id.to_s+"."+@book.config['htmlext']) %>" class="btn btn-default">
+              <a href="<%= h(@prev.id.to_s+"."+@book.config['htmlext']) %>" class="btn btn-default toc-button">
                 前章: <%= @prev.title %> に戻る
               </a>
             <% end %>
             <% if @next.present? %>
-              <a href="<%= h(@next.id.to_s+"."+@book.config['htmlext']) %>" class="btn btn-default">
+              <a href="<%= h(@next.id.to_s+"."+@book.config['htmlext']) %>" class="btn btn-default toc-button">
                 次章: <%= @next.title %> に進む
               </a>
             <% end %>
